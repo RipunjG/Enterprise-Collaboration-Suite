@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            /* Light Theme (Default) */
+            --primary: #4f46e5;       /* Indigo 600 */
+            --primary-hover: #4338ca; /* Indigo 700 */
+            --primary-light: #e0e7ff; /* Indigo 100 */
+            --danger: #ef4444;
+            
+            --bg-body: #f3f4f6;       /* Cool Gray 100 */
+            --bg-panel: #ffffff;
+            --bg-hover: #f9fafb;
+            --bg-input: #ffffff;
+            
+            --text-main: #111827;     /* Gray 900 */
+            --text-muted: #6b7280;    /* Gray 500 */
+            
+            --border: #e5e7eb;
+            --line-color: #cbd5e1;    /* For Tree Lines */
+            
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --primary: #6366f1;       /* Indigo 500 */
+            --primary-hover: #818cf8;
+            --primary-light: #1e1b4b; /* Indigo 950 */
+            
+            --bg-body: #0f172a;       /* Slate 900 */
+            --bg-panel: #1e293b;      /* Slate 800 */
+            --bg-hover: #334155;      /* Slate 700 */
+            --bg-input: #0f172a;
+            
+            --text-main: #f1f5f9;     /* Slate 100 */
+            --text-muted: #94a3b8;    /* Slate 400 */
+            
+            --border: #334155;
+            --line-color: #475569;
+            
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- GLOBAL RESET --- */
+        * { box-sizing: border-box; transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
+        body { margin: 0; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; color: var(--text-main); background: var(--bg-body); }
+        
+        /* --- UTILS --- */
+        .hidden { display: none !important; }
+        
+        /* --- BUTTONS & INPUTS --- */
+        button { font-family: inherit; }
+        .btn { padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 0.9em; border: none; transition: 0.2s; }
+        
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        
+        .btn-secondary { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+        .btn-secondary:hover { background: var(--primary-light); }
+
+        .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 4px 8px; font-size: 0.8em; }
+        .btn-danger:hover { background: var(--danger); color: white; }
+
+        input {
+            background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border);
+            padding: 12px; border-radius: 8px; outline: none; font-size: 0.95em;
+        }
+        input:focus { border-color: var(--primary); ring: 2px solid var(--primary-light); }
+
+        /* --- LOGIN SCREEN --- */
+        .login-container {
+            display: flex; justify-content: center; align-items: center; height: 100vh;
+            background: linear-gradient(135deg, var(--bg-body) 0%, var(--bg-panel) 100%);
+        }
+        .login-box {
+            background: var(--bg-panel); padding: 40px; border-radius: 16px; 
+            box-shadow: var(--shadow); width: 350px; text-align: center; border: 1px solid var(--border);
+        }
+        .login-box h2 { color: var(--primary); margin-bottom: 8px; font-weight: 700; }
+        .login-box p { color: var(--text-muted); font-size: 0.9em; margin-bottom: 24px; }
+        .login-inputs { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .btn-group { display: flex; gap: 10px; }
+        .btn-group .btn { flex: 1; }
+        .error-text { color: var(--danger); font-size: 0.85em; margin-top: 15px; display: none; }
+        .success-text { color: #10b981; font-size: 0.85em; margin-top: 15px; display: none; }
+
+        /* --- MAIN APP LAYOUT --- */
+        .app-layout { display: none; height: 100vh; }
+
+        /* 1. NAV RAIL (Leftmost) */
+        .nav-rail {
+            width: 70px; background: var(--bg-panel); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 10;
+        }
+        .nav-item {
+            width: 44px; height: 44px; border-radius: 10px; margin-bottom: 12px;
+            display: flex; justify-content: center; align-items: center;
+            color: var(--text-muted); cursor: pointer; font-size: 1.2em;
+        }
+        .nav-item:hover { background: var(--bg-hover); color: var(--primary); }
+        .nav-item.active { background: var(--primary-light); color: var(--primary); }
+        
+        .nav-spacer { flex: 1; } /* Pushes theme toggle to bottom */
+        
+        .theme-toggle { margin-bottom: 20px; font-size: 1.2em; }
+
+        /* 2. SIDEBAR */
+        .sidebar {
+            width: 320px; background: var(--bg-body); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 20px; height: 70px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border); background: var(--bg-panel);
+        }
+        .sidebar-title { font-weight: 700; font-size: 1.1em; color: var(--text-main); }
+        .add-btn {
+            background: var(--primary-light); color: var(--primary); border: none;
+            width: 32px; height: 32px; border-radius: 50%; font-size: 1.2em; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; transition: 0.2s;
+        }
+        .add-btn:hover { background: var(--primary); color: white; }
+
+        .sidebar-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .list-item {
+            padding: 12px 16px; border-radius: var(--radius); cursor: pointer; margin-bottom: 4px;
+            border: 1px solid transparent; display: flex; flex-direction: column;
+        }
+        .list-item:hover { background: var(--bg-panel); border-color: var(--border); }
+        .list-item.active { background: var(--bg-panel); border-color: var(--primary); box-shadow: var(--shadow); }
+        
+        .item-top { display: flex; justify-content: space-between; align-items: center; }
+        .item-name { font-weight: 600; color: var(--text-main); font-size: 0.95em; }
+        .item-badge { font-size: 0.8em; }
+        .item-preview { font-size: 0.85em; color: var(--text-muted); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* 3. MAIN CONTENT */
+        .main-content { flex: 1; background: var(--bg-panel); display: flex; flex-direction: column; position: relative; }
+
+        /* --- CHAT VIEW --- */
+        #view-chat { height: 100%; display: flex; flex-direction: column; }
+        .messages-area {
+            flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+            background-image: radial-gradient(var(--border) 1px, transparent 1px);
+            background-size: 20px 20px; /* Subtle dot pattern */
+        }
+        
+        .msg {
+            padding: 10px 16px; border-radius: 12px; max-width: 60%; font-size: 0.95em; line-height: 1.5;
+            position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .msg-my {
+            background: var(--primary); color: white; align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+        .msg-other {
+            background: var(--bg-body); color: var(--text-main); align-self: flex-start;
+            border: 1px solid var(--border); border-bottom-left-radius: 2px;
+        }
+        .msg b { display: block; font-size: 0.75em; margin-bottom: 4px; opacity: 0.8; }
+
+        .input-area {
+            padding: 20px; border-top: 1px solid var(--border); background: var(--bg-panel);
+            display: flex; gap: 12px; align-items: center;
+        }
+        .input-area input { flex: 1; border-radius: 24px; padding: 12px 20px; }
+        .input-area button { border-radius: 24px; padding: 12px 24px; }
+
+        /* --- HIERARCHY TREE VIEW --- */
+        #view-hierarchy {
+            padding: 40px; overflow: auto; height: 100%; background: var(--bg-body);
+            display: flex; justify-content: center; align-items: flex-start;
+        }
+        
+        /* Tree CSS Logic */
+        .tree ul {
+            padding-top: 20px; position: relative; display: flex; justify-content: center;
+        }
+        .tree li {
+            float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px;
+        }
+        
+        /* Connecting Lines */
+        .tree li::before, .tree li::after {
+            content: ''; position: absolute; top: 0; right: 50%;
+            border-top: 1px solid var(--line-color); width: 50%; height: 20px;
+        }
+        .tree li::after { right: auto; left: 50%; border-left: 1px solid var(--line-color); }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 1px solid var(--line-color); border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before {
+            content: ''; position: absolute; top: 0; left: 50%;
+            border-left: 1px solid var(--line-color); width: 0; height: 20px;
+        }
+
+        /* Node Card */
+        .node-card {
+            background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px;
+            padding: 12px; min-width: 180px; display: inline-block; text-decoration: none;
+            transition: 0.3s; box-shadow: var(--shadow); position: relative; z-index: 2;
+            cursor: pointer;
+        }
+        .node-card:hover {
+            border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .node-header {
+            font-weight: 700; color: var(--primary); margin-bottom: 8px; font-size: 1em;
+            display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px;
+        }
+        .node-members {
+            text-align: left; margin-bottom: 12px;
+        }
+        .member-pill {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-body); color: var(--text-main);
+            padding: 4px 8px; border-radius: 6px; margin-bottom: 4px; font-size: 0.85em; border: 1px solid var(--border);
+        }
+        .member-pill:hover { border-color: var(--danger); }
+        .remove-x { color: var(--danger); font-weight: bold; cursor: pointer; opacity: 0; }
+        .member-pill:hover .remove-x { opacity: 1; }
+
+        .node-actions { display: flex; gap: 6px; justify-content: center; }
+        .mini-btn {
+            border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.75em; cursor: pointer; color: white; font-weight: 600;
+        }
+        .btn-add-team { background: #10b981; } /* Emerald */
+        .btn-add-user { background: #3b82f6; } /* Blue */
+        
+        .delete-icon {
+            background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1em; transition: 0.2s;
+        }
+        .delete-icon:hover { color: var(--danger); }
+
+    </style>
+</head>
+<body>
+
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <h2>Enterprise Suite</h2>
+            <p>Secure Workspace Login</p>
+            
+            <div class="login-inputs">
+                <input id="usernameInput" placeholder="Username" />
+                <input id="passwordInput" type="password" placeholder="Password" />
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="login()">Log In</button>
+                <button class="btn btn-secondary" onclick="register()">Register</button>
+            </div>
+
+            <div id="loginError" class="error-text">Invalid credentials</div>
+            <div id="loginSuccess" class="success-text">Account created! You can now log in.</div>
+        </div>
+    </div>
+
+    <div id="mainApp" class="app-layout">
+        
+        <div class="nav-rail">
+            <div class="nav-item active" onclick="switchTab('chat')" title="Chats">💬</div>
+            <div class="nav-item" onclick="switchTab('hierarchy')" title="Organization">🌳</div>
+            
+            <div class="nav-spacer"></div>
+            
+            <div class="nav-item theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">🌓</div>
+            <div class="nav-item" onclick="logout()" title="Logout">🚪</div>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <span id="sidebarTitle" class="sidebar-title">Chats</span>
+                <button id="btnAddChat" onclick="promptNewChat()" class="add-btn" title="New Chat">+</button>
+            </div>
+            <div id="sidebarList" class="sidebar-list">
+                </div>
+        </div>
+
+        <div class="main-content">
+            
+            <div id="view-chat">
+                <div class="messages-area" id="messagesArea">
+                    <div style="text-align:center; color: var(--text-muted); margin-top: 50px;">
+                        Select a chat to start messaging
+                    </div>
+                </div>
+                <div class="input-area">
+                    <input id="msgInput" placeholder="Type a message..." autocomplete="off" onkeypress="handleEnter(event)">
+                    <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+            
+            <div id="view-hierarchy" class="tree hidden">
+                </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- THEME LOGIC ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+        }
+
+        // --- GLOBAL STATE ---
+        let currentUser = null, activeChat = null, currentTab = 'chat', ws = null;
+
+        // --- AUTH ---
+        async function login() {
+            const u = document.getElementById('usernameInput').value;
+            const p = document.getElementById('passwordInput').value;
+            if(!u || !p) return;
+
+            const formData = new URLSearchParams(); formData.append('username', u); formData.append('password', p);
+            
+            try {
+                const res = await fetch('http://localhost:8000/auth/login', { method: 'POST', body: formData });
+                if(res.ok) {
+                    currentUser = u;
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'flex';
+                    connectWebSocket(); 
+                    loadSidebar();
+                } else { 
+                    document.getElementById('loginError').style.display = 'block'; 
+                    document.getElementById('loginSuccess').style.display = 'none';
+                }
+            } catch(e) { alert("Server Error. Check Backend."); }
+        }
+
+        async function register() {
+            const u = document.getElementById('usernameInput').value;
+            const p = document.getElementById('passwordInput').value;
+            if(!u || !p) return;
+
+            const res = await fetch('http://localhost:8000/auth/register', { 
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: u, password: p}) 
+            });
+            if(res.ok) {
+                document.getElementById('loginSuccess').style.display = 'block';
+                document.getElementById('loginError').style.display = 'none';
+            } else { alert("Registration failed"); }
+        }
+
+        function logout() { location.reload(); }
+
+        // --- TABS & SIDEBAR ---
+        function switchTab(tab) {
+            currentTab = tab;
+            // Views
+            document.getElementById('view-chat').classList.toggle('hidden', tab !== 'chat');
+            document.getElementById('view-hierarchy').classList.toggle('hidden', tab !== 'hierarchy');
+            
+            // Icons
+            document.querySelectorAll('.nav-item')[0].classList.toggle('active', tab === 'chat');
+            document.querySelectorAll('.nav-item')[1].classList.toggle('active', tab === 'hierarchy');
+            
+            // Sidebar Logic
+            if(tab === 'chat') { 
+                document.getElementById('sidebarTitle').innerText = "Chats"; 
+                document.getElementById('btnAddChat').classList.remove('hidden');
+                loadSidebar(); 
+            } else { 
+                document.getElementById('sidebarTitle').innerText = "Organization"; 
+                document.getElementById('btnAddChat').classList.add('hidden');
+                document.getElementById('sidebarList').innerHTML = '<div style="padding:20px; font-size:0.9em; color:var(--text-muted); text-align:center;">Interact with the tree view to manage teams.</div>';
+                loadHierarchy(); 
+            }
+        }
+
+        async function loadSidebar() {
+            const list = document.getElementById('sidebarList'); 
+            list.innerHTML = ''; 
+
+            const res = await fetch(`http://localhost:8000/chat/sidebar/${currentUser}`);
+            const chats = await res.json();
+            
+            chats.forEach(c => {
+                const item = document.createElement('div'); item.className = 'list-item';
+                if(activeChat && activeChat.name === c.name) item.classList.add('active');
+                item.onclick = () => openChat(c.type, c.name, c.id);
+                
+                const icon = c.type === 'team' ? '🛡️' : '';
+                item.innerHTML = `
+                    <div class="item-top">
+                        <span class="item-name">${c.name}</span>
+                        <span class="item-badge">${icon}</span>
+                    </div>
+                    <div class="item-preview">${c.last_msg || 'No messages'}</div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        // --- HIERARCHY LOGIC ---
+        async function loadHierarchy() {
+            const res = await fetch('http://localhost:8000/org/hierarchy/');
+            const data = await res.json();
+            const container = document.getElementById('view-hierarchy');
+            
+            if(data.length === 0) { 
+                container.innerHTML = "<div style='text-align:center; padding:50px;'><p>No teams found.</p><button class='btn btn-primary' onclick='seedData()'>Initialize HQ</button></div>"; 
+                return; 
+            }
+            container.innerHTML = '<ul>' + data.map(node => buildTreeNode(node)).join('') + '</ul>';
+        }
+
+        function buildTreeNode(node) {
+            let membersHtml = node.members.map(m => `
+                <div class="member-pill">
+                    <span>${m}</span>
+                    <span class="remove-x" onclick="removeMember('${node.id}', '${m}')" title="Remove User">×</span>
+                </div>
+            `).join('');
+
+            // Added ondblclick logic
+            let html = `
+                <li>
+                    <div class="node-card" ondblclick="openTeamChat('${node.name}', '${node.id}')" title="Double click to chat">
+                        <div class="node-header">
+                            ${node.name}
+                            <button class="delete-icon" onclick="deleteTeam('${node.id}')" title="Delete Team">🗑</button>
+                        </div>
+                        <div class="node-members">${membersHtml || '<small style="color:var(--text-muted)">No members</small>'}</div>
+                        <div class="node-actions">
+                            <button class="mini-btn btn-add-team" onclick="addTeam('${node.id}')">+ Team</button>
+                            <button class="mini-btn btn-add-user" onclick="addMember('${node.id}')">+ User</button>
+                        </div>
+                    </div>
+            `;
+            if (node.children && node.children.length > 0) {
+                html += '<ul>' + node.children.map(child => buildTreeNode(child)).join('') + '</ul>';
+            }
+            html += '</li>';
+            return html;
+        }
+
+        // --- ACTIONS ---
+        async function seedData() {
+            await fetch('http://localhost:8000/org/teams/', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name: "Headquarters", parent_id: null })
+            });
+            loadHierarchy();
+        }
+
+        async function addTeam(parentId) {
+            const name = prompt("New Team Name:");
+            if(!name) return;
+            const res = await fetch('http://localhost:8000/org/teams/', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name: name, parent_id: parseInt(parentId) })
+            });
+            if(res.ok) loadHierarchy();
+        }
+
+        async function addMember(teamId) {
+            const username = prompt("Username to add:");
+            if(!username) return;
+            const res = await fetch('http://localhost:8000/org/members/add', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username: username, team_id: parseInt(teamId) })
+            });
+            if(res.ok) loadHierarchy(); else alert("User not found");
+        }
+
+        async function removeMember(teamId, username) {
+            if(!confirm(`Remove ${username}?`)) return;
+            const res = await fetch('http://localhost:8000/org/members/remove', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username: username, team_id: parseInt(teamId) })
+            });
+            if(res.ok) loadHierarchy();
+        }
+
+        async function deleteTeam(teamId) {
+            if(!confirm("Delete this team and all sub-teams?")) return;
+            const res = await fetch(`http://localhost:8000/org/teams/${teamId}`, { method: 'DELETE' });
+            if(res.ok) loadHierarchy();
+        }
+
+        function openTeamChat(name, id) {
+            switchTab('chat');
+            openChat('team', name, id);
+        }
+
+        // --- CHAT LOGIC ---
+        function connectWebSocket() {
+            ws = new WebSocket("ws://localhost:8000/chat/ws/" + currentUser);
+            ws.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                if(activeChat && (data.from === activeChat.name || data.to === activeChat.name || data.team === activeChat.name)) {
+                    renderMsg(data.from, data.msg, data.from === currentUser);
+                }
+                if(currentTab === 'chat') loadSidebar();
+            };
+        }
+
+        async function openChat(type, name, id) {
+            activeChat = { type, name, id };
+            document.getElementById('messagesArea').innerHTML = ''; 
+            loadSidebar(); // Updates active state
+            
+            const url = type === 'dm' ? `http://localhost:8000/chat/history/dm/${name}?my_username=${currentUser}` : `http://localhost:8000/chat/history/team/${id}`;
+            const hist = await (await fetch(url)).json();
+            hist.forEach(m => renderMsg(m.from, m.msg, m.from === currentUser));
+        }
+
+        function renderMsg(sender, txt, isMe) {
+            const d = document.createElement('div'); 
+            d.className = `msg ${isMe ? 'msg-my' : 'msg-other'}`;
+            // Use 'You' if me, otherwise sender name
+            const label = isMe ? '' : `<b>${sender}</b>`; 
+            d.innerHTML = `${label}${txt}`;
+            
+            const area = document.getElementById('messagesArea');
+            area.appendChild(d);
+            area.scrollTop = area.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('msgInput');
+            const txt = input.value;
+            if(!txt || !activeChat) return;
+            
+            const p = { 
+                msg: txt, 
+                type: activeChat.type, 
+                to: activeChat.type==='dm' ? activeChat.name : undefined, 
+                team_id: activeChat.type==='team' ? activeChat.id : undefined 
+            };
+            
+            ws.send(JSON.stringify(p)); 
+            input.value = '';
+        }
+
+        function promptNewChat() { 
+            const t = prompt("Enter Username or Team Name:"); 
+            if(t) openChat('dm', t); 
+        }
+        
+        function handleEnter(e) { if(e.key === 'Enter') sendMessage(); }
+
+    </script>
+</body>
+</html>
