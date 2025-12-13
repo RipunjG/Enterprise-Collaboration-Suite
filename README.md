@@ -1,66 +1,71 @@
-# Enterprise Collaboration Suite
+# Enterprise Suite
 
-A modern, full-stack application designed to enhance internal communication and productivity within an organization. This platform integrates core business tools into a single, intuitive interface, built with a focus on security, scalability, and real-time performance.
+A modern, full-stack application designed to simulate a real-world corporate communication environment. This platform integrates organizational management and real-time messaging into a single, intuitive interface, built with a focus on recursive data structures, security, and low-latency performance.
 
 ## Features
 
--   **Real-time Chat:** An instant messaging system supporting one-on-one and group communication with persistent message history.
--   **Organizational Hierarchy:** A dynamic system to model and visualize the company's reporting structure, complete with tools for assigning managers and employees.
--   **Meeting Management:** A comprehensive suite for scheduling, planning, and managing virtual meetings.
--   **Secure Authentication:** A robust user registration and login system powered by JWTs to ensure secure and authorized access.
+-   **Real-time Chat:** An instant messaging system supporting persistent one-on-one and team-based communication using WebSockets.
+-   **Organizational Hierarchy:** A dynamic, recursive system to model infinite levels of reporting structures (HQ -> Department -> Team), with visual tree management.
+-   **Smart Context:** Users are restricted to communicating only within their assigned teams, enforcing organizational security boundaries.
+-   **Secure Authentication:** A robust user registration and login system powered by JWTs (JSON Web Tokens) and Argon2 password hashing.
+-   **Modern UI/UX:** A responsive Single Page Application (SPA) featuring Dark Mode, Glassmorphism design, and smooth transitions.
 
 ## Technology Stack
 
 **Backend**
--   **Framework:** FastAPI (Python) - Chosen for its high performance and asynchronous capabilities, ideal for handling real-time requests.
--   **Real-time Communication:** WebSockets - The standard protocol for low-latency, bi-directional data transfer.
--   **Message Broker:** Redis - Used for its high-speed Pub/Sub functionality, enabling efficient message broadcasting to all connected clients.
--   **Database:** PostgreSQL - An enterprise-grade, relational database providing strong data integrity and powerful schema management.
--   **Authentication:** JWT (JSON Web Tokens) - For secure, stateless authentication.
+-   **Framework:** FastAPI (Python) - Chosen for its high performance and native asynchronous support.
+-   **Real-time Communication:** WebSockets - Direct, bi-directional connections for instant message delivery.
+-   **Database:** PostgreSQL - An enterprise-grade relational database handling complex recursive queries for organizational trees.
+-   **ORM:** SQLAlchemy - Manages database interactions with advanced relationship mapping (Self-Referential/Recursive).
+-   **Authentication:** JWT (JSON Web Tokens) - For secure, stateless session management.
 
 **Frontend**
--   **Framework:** React.js - For building a dynamic and responsive user interface with a component-based architecture.
--   **Core Languages:** JavaScript, HTML, CSS - The foundation of the web application.
+-   **Architecture:** Vanilla JavaScript (ES6+) - A lightweight, dependency-free Single Page Application (SPA) architecture.
+-   **Styling:** CSS3 Variables & Flexbox - Custom theming engine with native Dark Mode support.
+-   **Interface:** Pure HTML5 - Semantic structure without the overhead of heavy frontend frameworks.
+
+**Infrastructure**
+-   **Containerization:** Docker & Docker Compose - Orchestrates the application and database services for consistent deployment.
 
 ## Architecture
 
-The application follows a clean, layered architecture:
+The application follows a clean, Micro-Monolith architecture:
 
--   **Client:** The React.js frontend sends requests to the backend API and maintains a persistent WebSocket connection for real-time updates.
--   **Server:** A FastAPI backend manages all business logic, authenticates users, and interacts with the database.
--   **Real-time Engine:** WebSocket connections are managed by the FastAPI server, which uses Redis as a message broker to efficiently broadcast messages to all relevant clients.
--   **Data Storage:** A PostgreSQL database securely stores all application data, including user profiles, chat history, and the organizational hierarchy.
+-   **Client:** The Vanilla JS frontend establishes a persistent WebSocket connection for real-time updates and fetches REST API data for structural changes.
+-   **Server:** A FastAPI backend manages all business logic, enforces role-based access control, and routes messages.
+-   **Data Layer:** PostgreSQL stores relational data, including the recursive adjacency list used to build the organizational tree.
+-   **Security Layer:** Passwords are salted and hashed using Argon2; API endpoints are protected via OAuth2 dependency injection.
 
 ## Project Documentation
 
 This project demonstrates a professional understanding of:
 
--   **Full-Stack Development:** Expertise in both frontend and backend development.
--   **Real-time Systems:** Building and managing real-time applications using WebSockets and Pub/Sub patterns.
--   **Scalable Architecture:** Designing a system that can handle a large number of concurrent users by leveraging asynchronous programming and message brokers.
--   **Security:** Implementing secure authentication and managing sensitive data through best practices like environment variables and JWTs.
+-   **Full-Stack Development:** Integrating a Python async backend with a raw JavaScript frontend.
+-   **Database Engineering:** Implementing recursive Common Table Expressions (CTEs) and Cascade Delete operations for hierarchical data.
+-   **Real-time Systems:** Managing WebSocket lifecycles, broadcasting logic, and connection persistence.
+-   **Security Best Practices:** Implementing secure authentication flows and managing sensitive data through environment isolation.
 
 ## Getting Started
 
-To run the project locally, you will need Python 3.8+ and Docker (for setting up PostgreSQL and Redis).
+To run the project locally, you will need **Docker Desktop** installed.
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/RipunjG/Enterprise-Collaboration-Suite
-    cd Enterprise-Collaboration-Suite
+    git clone [https://github.com/RipunjG/Enterprise-Collaboration-Suite.git](https://github.com/RipunjG/Enterprise-Collaboration-Suite.git)
+    cd enterprise-suite
     ```
+    
+2.  **Start the System:**
+    Run the following command to build the backend image and start the database container:
+    ```bash
+    docker-compose up --build
+    ```
+    *Wait for the logs to show "Uvicorn running on http://0.0.0.0:8000".*
 
-2.  **Set up the backend:**
-    -   Create a `.env` file from `.env.example`.
-    -   Run `docker-compose up -d` to start the database and Redis.
-    -   Create and activate a virtual environment (`python -m venv venv`).
-    -   Install dependencies (`pip install -r requirements.txt`).
-    -   Run database migrations.
-    -   Start the FastAPI server.
+3.  **Launch the Application:**
+    -   Open the `frontend.html` file in any modern web browser.
+    -   Register a new user to get started.
 
-3.  **Set up the frontend:**
-    -   Navigate to the frontend directory.
-    -   Install dependencies (`npm install`).
-    -   Start the development server (`npm start`).
-
-*Note: Detailed instructions and specific commands will be provided in the project files.*
+4.  **Usage Tips:**
+    -   **Initialize:** If the Organization tree is empty, click the initialization button in the hierarchy view to create the Head Office.
+    -   **Dark Mode:** Toggle the theme using the moon icon in the sidebar.
